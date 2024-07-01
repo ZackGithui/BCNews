@@ -26,4 +26,14 @@ data class Article(
 )
 
 
+fun Article.toArticleData():ArticleData{
+    return ArticleData(
+        title=title,
+        url=url,
+        description=description,
+        urlToImage=urlToImage,
+        content=content
+    )
+}
+
 

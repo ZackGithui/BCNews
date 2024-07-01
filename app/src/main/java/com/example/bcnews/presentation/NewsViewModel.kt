@@ -62,7 +62,7 @@ class NewsViewModel @Inject constructor(private val repository: NewsRepository):
 
 
 data class NewsState(
-    val data :List<Article> = emptyList(),
+    val data :List<ArticleData> = emptyList(),
     val error: String?=null,
     val isLoading:Boolean=false
 

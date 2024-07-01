@@ -11,11 +11,11 @@ import java.io.IOException
 import javax.inject.Inject
 
 class RepositoryImp @Inject constructor(private val api:NewsApi):NewsRepository {
-    override suspend fun getTopHeadlines(category: String): Flow<Resource<List<Article>>> = flow {
+    override suspend fun getTopHeadlines(category: String): Flow<Resource<List<ArticleData>>> = flow {
         emit(Resource.Loading())
         try {
-            val response = api.getTopHeadlines(category)
-            emit(Resource.Success(response.articles))
+            val response = api.getTopHeadlines(category).articles.map { it.toArticleData() }
+            emit(Resource.Success(response))
         } catch (e: HttpException) {
             emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred"))
         } catch (e: IOException) {
