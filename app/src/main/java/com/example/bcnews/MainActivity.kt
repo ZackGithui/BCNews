@@ -1,5 +1,6 @@
 package com.example.bcnews
 
+import NewsScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,7 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.bcnews.presentation.NewsScreen
+
 import com.example.bcnews.presentation.NewsViewModel
 import com.example.bcnews.ui.theme.BCNewsTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,7 +25,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BCNewsTheme {
-                NewsScreen()
+               NewsScreen()
             }
         }
     }

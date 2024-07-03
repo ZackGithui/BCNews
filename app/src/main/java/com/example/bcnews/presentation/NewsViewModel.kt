@@ -1,5 +1,6 @@
 package com.example.bcnews.presentation
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,15 +29,15 @@ class NewsViewModel @Inject constructor(private val repository: NewsRepository):
     val state:StateFlow<NewsState> = _state.asStateFlow()
 
     init {
-        getNewsArticles(category = "general")
+        getNewsArticles(category = "business")
     }
 
-    private fun getNewsArticles(category:String){
+    private  fun getNewsArticles(category:String){
         viewModelScope.launch {
-             repository.getTopHeadlines(category = category).collect{ result ->
+             repository.getTopHeadlines(category=category).collect{ result ->
                 when (result) {
                     is Resource.Success -> {
-                        _state.value = NewsState(result.data ?: emptyList())
+                        _state.value = NewsState(result.data?: emptyList())
                     }
 
                     is Resource.Error -> {

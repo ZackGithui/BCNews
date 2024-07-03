@@ -3,6 +3,7 @@ package com.example.bcnews.data
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import java.io.Serial
 
 @JsonClass(generateAdapter = true)
 data class NewsResponse(
