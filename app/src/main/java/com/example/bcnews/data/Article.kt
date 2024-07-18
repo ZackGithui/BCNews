@@ -18,7 +18,7 @@ data class Article(
     @Json(name = "source")
     val source: Source?,
     @Json(name = "title")
-    val title: String,
+    val title: String?,
     @Json(name = "url")
     val url: String?,
     @Json(name = "urlToImage")
@@ -32,7 +32,9 @@ fun Article.toArticleData():ArticleData{
         url=url,
         description=description,
         urlToImage=urlToImage,
-        content=content
+        content=content,
+        publishedAt=publishedAt,
+        author=author,
     )
 }
 

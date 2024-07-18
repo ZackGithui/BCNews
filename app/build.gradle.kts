@@ -102,4 +102,7 @@ dependencies {
     // System UI Controller
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
     implementation ("com.google.accompanist:accompanist-flowlayout:0.34.0")
+
+    //accompanist
+    implementation ("com.google.accompanist:accompanist-pager:0.24.13-rc")
 }

@@ -20,7 +20,7 @@ class RepositoryImp @Inject constructor(private val api: NewsApi) : NewsReposito
         emit(Resource.Loading())
         try {
            // Log.d(TAG, "Fetching top headlines for category: $category")
-            val response = api.getTopHeadlines()
+            val response = api.getTopHeadlines(category=category)
             Log.d(TAG, "Response: $response")
             val articles = response.articles.map { it.toArticleData() }
             emit(Resource.Success(articles))
