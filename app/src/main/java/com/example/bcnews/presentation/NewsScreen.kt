@@ -1,6 +1,7 @@
 package com.example.bcnews.presentation
 
 import CategoryTab
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,27 +14,27 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
-import com.example.bcnews.domain.model.ArticleData
 import com.example.bcnews.presentation.components.BottomSheet
 import com.example.bcnews.presentation.components.NewsArticle
+import com.example.bcnews.presentation.search.SearchScreen
 import com.example.bcnews.presentation.components.ShimmerEffect
 import com.example.bcnews.presentation.components.TopPart
 import com.example.bcnews.presentation.navigation.AppScreen
+import com.example.bcnews.presentation.search.SearchViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun NewsScreen(viewModel: NewsViewModel = hiltViewModel(),
+fun NewsScreen(
+    viewModel: NewsViewModel = hiltViewModel(),
                navController: NavHostController) {
     val state by viewModel.state.collectAsState()
 
@@ -44,6 +45,13 @@ fun NewsScreen(viewModel: NewsViewModel = hiltViewModel(),
     var shouldBottomSheetShow= remember {
         mutableStateOf(false)
     }
+    var isSearchScreenVisible:Boolean=false
+    val focusRequester= remember {
+        FocusRequester()
+    }
+
+
+
     if (shouldBottomSheetShow.value){
         ModalBottomSheet(
             onDismissRequest = { shouldBottomSheetShow.value=true
@@ -72,7 +80,11 @@ fun NewsScreen(viewModel: NewsViewModel = hiltViewModel(),
 
 
 
-    Scaffold(topBar = { TopPart(onButtonClick = {navController.navigate(AppScreen.SearchScreen.route)}) }) { paddingValues ->
+    Scaffold(topBar = { TopPart(onButtonClick = {
+        navController.navigate(AppScreen.SearchScreen.route)
+        isSearchScreenVisible =true
+    viewModel.state.value.data= emptyList()
+    }) }) { paddingValues ->
 
         Column(
             modifier = Modifier
@@ -106,28 +118,68 @@ fun NewsScreen(viewModel: NewsViewModel = hiltViewModel(),
                 }
             }
             else{
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 2.dp),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(state.data) { article ->
-                        NewsArticle(
-                            articleData = article,
-                            onCardClicked = {viewModel.onEvent(NewsEvents.NewsClicked(articleData = it))
-                                shouldBottomSheetShow.value=true
 
+
+                Crossfade(targetState = isSearchScreenVisible) { isVisible ->
+                    if (isVisible) {
+                        SearchScreen(
+
+                            navController = navController,
+
+                            onCloseButtonClicked = { /*TODO*/ },
+                            onSearchIconClicked = {
+                                coroutineScope.launch {
+                                    delay(500)
+                                    focusRequester.requestFocus()
+                                }
+
+                            },
+                            )
+
+                              LazyColumn {
+                                  items(state.data){article->
+                                      NewsArticle(
+                                          articleData = article,
+                                          onCardClicked = {})
+
+
+
+                                  }
+                              }
+
+
+
+
+
+
+
+                    } else {
+
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 2.dp),
+                                contentPadding = PaddingValues(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                items(state.data) { article ->
+                                    NewsArticle(
+                                        articleData = article,
+                                        onCardClicked = {
+                                            viewModel.onEvent(NewsEvents.NewsClicked(articleData = it))
+                                            shouldBottomSheetShow.value = true
+
+                                        }
+                                    )
+                                }
                             }
-                        )
+                        }
                     }
                 }
-            }
         }
     }
 }}

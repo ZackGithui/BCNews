@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BCNews</string>
+    <string name="search">Search News</string>
 </resources>

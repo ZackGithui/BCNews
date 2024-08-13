@@ -1,5 +1,10 @@
 package com.example.bcnews.presentation
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bcnews.domain.model.ArticleData
@@ -17,6 +22,11 @@ class NewsViewModel @Inject constructor(private val repository: NewsRepository) 
 
     private val _state = MutableStateFlow(NewsState())
     val state: StateFlow<NewsState> = _state.asStateFlow()
+
+    private val _onSearchQueryChanged ={
+        mutableStateOf("")
+    }
+    var onSearchQueryChanged=_onSearchQueryChanged
 
 
 
@@ -39,12 +49,15 @@ class NewsViewModel @Inject constructor(private val repository: NewsRepository) 
 
             }
 
+
         }
     }
     init {
         getNewsArticles(category = _state.value.category)
     }
+init {
 
+}
 
     private  fun getNewsArticles(category:String) {
         viewModelScope.launch {
@@ -71,12 +84,48 @@ class NewsViewModel @Inject constructor(private val repository: NewsRepository) 
             }
         }
     }
+
+
+    private fun searchNews(query:String){
+        if (query.isEmpty()){
+            return
+        }
+        viewModelScope.launch {
+            repository.searchNews(query = query).collect{result->
+                when(result){
+                    is Resource.Loading ->{
+                        _state.value=_state.value.copy(isLoading = true)
+                    }
+                    is Resource.Success->{
+                        _state.value=_state.value.copy(
+                            isLoading = false,
+                            data = result.data?: emptyList(),
+                            error = null
+                        )
+                    }
+                    is Resource.Error->{
+                        _state.value=_state.value.copy(
+                            isLoading = false,
+                            error = result.message?:"unexpected error occurred!"
+                        )
+                    }
+                }
+
+
+            }
+        }
+
+
+    }
 }
 
 data class NewsState(
-    val data: List<ArticleData> = emptyList(),
+    var data: List<ArticleData> = emptyList(),
     val error: String? = null,
     val isLoading: Boolean = false,
     val category: String="sports",
-    val selectedArticle:ArticleData?=null
+    val selectedArticle:ArticleData?=null,
+    val text:String="",
+    val active:Boolean=false,
+    val onSearchScreenVisible:Boolean=false
 )

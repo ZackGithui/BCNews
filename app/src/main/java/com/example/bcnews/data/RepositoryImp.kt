@@ -21,19 +21,40 @@ class RepositoryImp @Inject constructor(private val api: NewsApi) : NewsReposito
         try {
            // Log.d(TAG, "Fetching top headlines for category: $category")
             val response = api.getTopHeadlines(category=category)
-            Log.d(TAG, "Response: $response")
+
             val articles = response.articles.map { it.toArticleData() }
             emit(Resource.Success(articles))
-            Log.d(TAG, "Successfully fetched ${articles.size} articles")
+
         } catch (e: HttpException) {
-            Log.e(TAG, "HttpException: ${e.message}")
+
             emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred"))
         } catch (e: IOException) {
-            Log.e(TAG, "IOException: ${e.message}")
             emit(Resource.Error("Couldn't reach server. Check your internet connection."))
         } catch (e: Exception) {
-            Log.e(TAG, "Exception: ${e.message}")
+
             emit(Resource.Error("An unknown error occurred"))
         }
     }
+
+    override suspend fun searchNews(query: String): Flow<Resource<List<ArticleData>>> =flow {
+        emit(Resource.Loading())
+        try {
+            val response=api.searchNews(query=query)
+            val articles=response.articles.map { it.toArticleData() }
+            emit(Resource.Success(articles))
+        }
+        catch (e:HttpException){
+            emit(Resource.Error(e.localizedMessage?:"An unexpected error occurred!"))
+        }
+        catch (e:IOException){
+            emit(Resource.Error("Couldn't reach the server check your internet connection."))
+        }
+        catch (e:Exception){
+            emit(Resource.Error("An unknown error occurred!"))
+        }
+
+    }
+
+
+
 }

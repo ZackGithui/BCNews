@@ -12,10 +12,18 @@ interface NewsApi {
     suspend fun getTopHeadlines(
         @Query("category") category:String="general",
         @Query("language") language:String="en",
-        @Query("pageSize") pageSize:Int=100,
+        @Query("pageSize") pageSize:Int=30,
         @Query("apiKey")apiKey: String=Constants.API_KEY
 
     ):NewsResponse
+
+    @GET("everything")
+    suspend fun searchNews(
+        @Query("q") query:String,
+        @Query("apiKey")apiKey: String=Constants.API_KEY
+
+    ):NewsResponse
+
 
 
 }
